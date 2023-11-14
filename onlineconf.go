@@ -201,7 +201,7 @@ func WalkByYML(obj reflect.Value, prefix string) map[string]OnlineConfItem {
 			sliceObj := obj.Index(i)
 			switch sliceObj.Kind() {
 			case reflect.String, reflect.Float64, reflect.Int, reflect.Bool, reflect.Interface:
-				list = append(list, fmt.Sprintf("%v", sliceObj.Interface()))
+				list = append(list, fmt.Sprintf("- %v", sliceObj.Interface()))
 			default:
 				log.Fatal(fmt.Errorf("unsuported type: %+v, %+v", sliceObj.Kind(), sliceObj))
 			}
@@ -211,8 +211,8 @@ func WalkByYML(obj reflect.Value, prefix string) map[string]OnlineConfItem {
 		if len(list) > 0 {
 			o[prefix] = OnlineConfItem{
 				Key:   prefix,
-				Value: strings.Join(list, ","),
-				Type:  "application/x-list",
+				Value: strings.Join(list, "\n"),
+				Type:  "application/x-yaml",
 			}
 		}
 	case reflect.String:
