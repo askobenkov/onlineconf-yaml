@@ -7,7 +7,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -22,7 +21,7 @@ import (
 )
 
 /*
-  go run onlineconf.go -onlineConfUrl https://onlineconf.local/config -exportConfigFilepath ./Revise1.yml -headersFilepath ./headers.txt -mainNodeName revise -showParsedConfig
+go run onlineconf.go -onlineConfUrl https://onlineconf.local/config -exportConfigFilepath ./Revise1.yml -headersFilepath ./headers.txt -mainNodeName revise -showParsedConfig -basicAuthKey BASIC_AUTH_KEY
 */
 func main() {
 
@@ -35,6 +34,7 @@ func main() {
 	deleteParsedConfig := flag.Bool("deleteParsedConfig", false, "Delete config in OnlineConf")
 	skipAlreadyExist := flag.Bool("skipAlreadyExist", false, "Skip already exist error")
 	skipCreateNode := flag.Bool("skipCreateNode", false, "Skip create node")
+	basicAuthKey := flag.String("basicAuthKey", "", "Basic autorization key")
 
 	flag.Parse()
 
@@ -45,6 +45,7 @@ func main() {
 	client, err := NewOnlineConfClient(
 		fmt.Sprintf("%s/%s", *onlineConfUrl, *mainNodeName),
 		*headersFilepath,
+		*basicAuthKey,
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -100,8 +101,6 @@ func main() {
 			}
 		}
 	}
-
-	return
 
 }
 
@@ -254,12 +253,48 @@ func mergeMaps(a, b map[string]OnlineConfItem) map[string]OnlineConfItem {
 func GetYMLConfig(filepath string) (interface{}, error) {
 	var data interface{}
 
-	file, err := ioutil.ReadFile(filepath)
+	readFile, err := os.Open(filepath)
 	if err != nil {
 		return data, err
 	}
+	defer readFile.Close()
+	reader := bufio.NewReader(readFile)
+	yamlProcessed := ""
+	lineNumber := 0
+	for {
+		line, err := reader.ReadString('\n')
+		if len(line) == 0 && err != nil {
+			if err == io.EOF {
+				break
+			}
+			return data, err
+		}
+		line = strings.ReplaceAll(line, ": \"", ": \"")
 
-	err = yaml.Unmarshal(file, &data)
+		listRow := strings.Split(line, ":")
+		if len(listRow) == 2 {
+			listRow[1] = strings.TrimSpace(listRow[1])
+			if listRow[1] != "" {
+				if _, err := strconv.Atoi(listRow[1]); err != nil {
+					listRow[1] = strings.ReplaceAll(listRow[1], "'", "")
+					listRow[1] = strings.ReplaceAll(listRow[1], "\"", "")
+					listRow[1] = fmt.Sprintf("'%s'", listRow[1])
+				}
+			}
+			line = strings.Join(listRow, ": ") + "\n"
+		}
+		lineNumber++
+
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return data, err
+		}
+		yamlProcessed += line
+	}
+
+	err = yaml.Unmarshal([]byte(yamlProcessed), &data)
 	if err != nil {
 		return data, err
 	}
@@ -281,6 +316,7 @@ type OnlineConfResponse struct {
 func NewOnlineConfClient(
 	host string,
 	filepathHeader string,
+	basicAuthKey string,
 ) (*OnlineConfClient, error) {
 
 	client := &OnlineConfClient{
@@ -294,6 +330,11 @@ func NewOnlineConfClient(
 			return nil, err
 		}
 		client.headers = headers
+	} else {
+		client.headers = map[string]string{
+			"X-Requested-With": "XMLHttpRequest",
+			"Authorization":    fmt.Sprintf("Basic %s", basicAuthKey),
+		}
 	}
 
 	return client, nil
@@ -316,6 +357,9 @@ func (client *OnlineConfClient) GetHeaders(filepath string) (map[string]string, 
 	for scanner.Scan() {
 		line := scanner.Text()
 		list := strings.Split(line, ":")
+		if len(list) != 2 {
+			continue
+		}
 		headers[strings.TrimSpace(list[0])] = strings.TrimSpace(list[1])
 	}
 	if err := scanner.Err(); err != nil {
@@ -462,7 +506,7 @@ func (client *OnlineConfClient) request(
 	}
 	defer res.Body.Close()
 
-	bodyBytes, err := ioutil.ReadAll(res.Body)
+	bodyBytes, err := io.ReadAll(res.Body)
 	if err != nil {
 		return 0, "", fmt.Errorf("can't read http response...%s", err.Error())
 	}
