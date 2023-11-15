@@ -20,21 +20,23 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const UrlPrefix = "config"
+
 /*
-go run onlineconf.go -onlineConfUrl https://onlineconf.local/config -exportConfigFilepath ./Revise1.yml -headersFilepath ./headers.txt -mainNodeName revise -showParsedConfig -basicAuthKey BASIC_AUTH_KEY
+go run onlineconf.go -onlineConfUrl https://onlineconf.local -exportConfigFilepath ./exportConfig.yml -headersFilepath ./headers.txt -mainNodeName exportConfig -showParsedConfig -exportParsedConfig
 */
 func main() {
 
-	onlineConfUrl := flag.String("onlineConfUrl", "https://onlineconf.local/config", "OnlineConf URL name")
+	onlineConfUrl := flag.String("onlineConfUrl", "https://onlineconf.local", "OnlineConf URL name")
 	configFilepath := flag.String("exportConfigFilepath", "", "export config filepath")
-	headersFilepath := flag.String("headersFilepath", "", "headers filepath")
+	headersFilepath := flag.String("headersFilepath", "", "file with raw browser headers")
 	mainNodeName := flag.String("mainNodeName", "", "OnlineConf main node name")
 	showParsedConfig := flag.Bool("showParsedConfig", false, "Show parsed config")
 	exportParsedConfig := flag.Bool("exportParsedConfig", false, "Export parsed config to OnlineConf")
 	deleteParsedConfig := flag.Bool("deleteParsedConfig", false, "Delete config in OnlineConf")
 	skipAlreadyExist := flag.Bool("skipAlreadyExist", false, "Skip already exist error")
 	skipCreateNode := flag.Bool("skipCreateNode", false, "Skip create node")
-	basicAuthKey := flag.String("basicAuthKey", "", "Basic autorization key")
+	basicAuthKey := flag.String("basicAuthKey", "", "Basic autorization key (docker only)")
 
 	flag.Parse()
 
@@ -43,7 +45,7 @@ func main() {
 	}
 
 	client, err := NewOnlineConfClient(
-		fmt.Sprintf("%s/%s", *onlineConfUrl, *mainNodeName),
+		fmt.Sprintf("%s/%s/%s", *onlineConfUrl, UrlPrefix, *mainNodeName),
 		*headersFilepath,
 		*basicAuthKey,
 	)
@@ -199,14 +201,18 @@ func WalkByYML(obj reflect.Value, prefix string) map[string]OnlineConfItem {
 		list := []string{}
 		for i := 0; i < obj.Len(); i++ {
 			sliceObj := obj.Index(i)
-			switch sliceObj.Kind() {
-			case reflect.String, reflect.Float64, reflect.Int, reflect.Bool, reflect.Interface:
-				list = append(list, fmt.Sprintf("- %v", sliceObj.Interface()))
+			toMarshalIf := sliceObj.Interface()
+			switch v := toMarshalIf.(type) {
+			case string, float64, int, bool:
+				list = append(list, fmt.Sprintf("- %v", v))
 			default:
-				log.Fatal(fmt.Errorf("unsuported type: %+v, %+v", sliceObj.Kind(), sliceObj))
+				toMarshalIf = []interface{}{v}
+				yamlOption, err := yaml.Marshal(toMarshalIf)
+				if err != nil {
+					log.Fatal(fmt.Errorf("can't marshal %+v to yaml... %+v", sliceObj.Interface(), err))
+				}
+				list = append(list, fmt.Sprintf("%v", string(yamlOption)))
 			}
-			//res := WalkByYML(obj.Index(i), fmt.Sprintf("%s.%d", prefix, i))
-			//o = mergeMaps(o, res)
 		}
 		if len(list) > 0 {
 			o[prefix] = OnlineConfItem{
