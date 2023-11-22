@@ -23,16 +23,16 @@ import (
 const UrlPrefix = "config"
 
 /*
-go run onlineconf.go -onlineConfUrl https://onlineconf.local -exportConfigFilepath ./exportConfig.yml -headersFilepath ./headers.txt -mainNodeName exportConfig -showParsedConfig -exportParsedConfig
+go run onlineconf.go -onlineConfUrl https://onlineconf.local -importConfigFilepath ./importConfig.yml -headersFilepath ./headers.txt -mainNodeName importConfig -showParsedConfig -importParsedConfig
 */
 func main() {
 
 	onlineConfUrl := flag.String("onlineConfUrl", "https://onlineconf.local", "OnlineConf URL name")
-	configFilepath := flag.String("exportConfigFilepath", "", "export config filepath")
+	configFilepath := flag.String("importConfigFilepath", "", "import config filepath")
 	headersFilepath := flag.String("headersFilepath", "", "file with raw browser headers")
 	mainNodeName := flag.String("mainNodeName", "", "OnlineConf main node name")
 	showParsedConfig := flag.Bool("showParsedConfig", false, "Show parsed config")
-	exportParsedConfig := flag.Bool("exportParsedConfig", false, "Export parsed config to OnlineConf")
+	importParsedConfig := flag.Bool("importParsedConfig", false, "Import parsed config to OnlineConf")
 	deleteParsedConfig := flag.Bool("deleteParsedConfig", false, "Delete config in OnlineConf")
 	skipAlreadyExist := flag.Bool("skipAlreadyExist", false, "Skip already exist error")
 	skipCreateNode := flag.Bool("skipCreateNode", false, "Skip create node")
@@ -41,7 +41,7 @@ func main() {
 	flag.Parse()
 
 	if *configFilepath == "" {
-		log.Fatal(fmt.Errorf("export filepath config is empty"))
+		log.Fatal(fmt.Errorf("import filepath config is empty"))
 	}
 
 	client, err := NewOnlineConfClient(
@@ -70,7 +70,7 @@ func main() {
 	nodeKeys := getParentNodeKeys(src)
 	log.Printf("create =============> %+v\n", nodeKeys)
 
-	if *exportParsedConfig {
+	if *importParsedConfig {
 		if !*skipCreateNode {
 			log.Printf("client.CreateEmptyNode..")
 
