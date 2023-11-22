@@ -11,8 +11,9 @@ Options:
 * [deleteParsedConfig] - delete parsed config
 * [skipAlreadyExist] - skip already exists error
 * [skipCreateNode] - skip node creating
+* [basicAuthKey] - Basic autorization key (docker only)
 
 Run:
 ```
-go run onlineconf.go -onlineConfUrl https://onlineconf.dev.dmr/config -exportConfigFilepath ./Revise1.yml -headersFilepath ./headers.txt -mainNodeName revise -showParsedConfig
+go run onlineconf.go -onlineConfUrl https://onlineconf.local -exportConfigFilepath ./exportConfig.yml -headersFilepath ./headers.txt -mainNodeName exportConfig -showParsedConfig -exportParsedConfig
 ```
