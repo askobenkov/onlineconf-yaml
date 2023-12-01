@@ -56,10 +56,11 @@ jobs:
       uses: addnab/docker-run-action@v3
       with:
         image: centos:7
-        options: -v ${{ github.workspace }}:/onlineconf-yaml -e PIPELINE_IID=${{ github.event.number }} -e PKG_NAME=onlineconf-yaml
+        options: -v ${{ github.workspace }}:/onlineconf-yaml -e PKG_NAME=onlineconf-yaml
         run: |
           cd /onlineconf-yaml/REPO
           PKG_VER=$(cat version.txt)
+          RELEASE_ID=$(date +%Y%m%d)
           
           yum clean all
           yum install -y yum-utils
@@ -69,7 +70,7 @@ jobs:
 
           git archive --format=tar HEAD --prefix="${PKG_NAME}-${PKG_VER}/" | gzip > "${PKG_NAME}-${PKG_VER}.tar.gz"
           yum-builddep -y "${PKG_NAME}.spec"
-          rpmbuild -ba --define "_sourcedir $PWD" --define "__version $PKG_VER" --define "__release $PIPELINE_IID" "${PKG_NAME}.spec"
+          rpmbuild -ba --define "_sourcedir $PWD" --define "__version $PKG_VER" --define "__release $RELEASE_ID" "${PKG_NAME}.spec"
           mv $HOME/rpmbuild/RPMS/x86_64/*rpm ./
           mv $HOME/rpmbuild/SRPMS/*rpm ./
 
