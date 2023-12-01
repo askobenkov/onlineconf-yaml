@@ -1,6 +1,6 @@
 # onlineconf-yaml
 
-Utility for import yaml config to OnlineConf by admin web interface
+## yml2onlineconf - utility for import yaml config to OnlineConf by admin web interface
 
 Options:
 * onlineConfUrl - onlineconf web interface URL
@@ -16,5 +16,17 @@ Options:
 
 Run:
 ```
-go run onlineconf.go -onlineConfUrl https://onlineconf.local -importConfigFilepath ./importConfig.yml -headersFilepath ./headers.txt -mainNodeName importConfig -showParsedConfig -importParsedConfig
+yml2onlineconf -onlineConfUrl https://onlineconf.local -importConfigFilepath ./importConfig.yml -headersFilepath ./headers.txt -mainNodeName importConfig -showParsedConfig -importParsedConfig
+```
+
+## yml2cdb - utility for convert yml config to cdb database
+
+Options:
+* ymlConfigFilepath - input filepath to yml config
+* cdbConfigFilepath - output filepath to cdb database
+* [showParsedConfig] - show parsed config
+
+Run:
+```
+yml2cdb -ymlConfigFilepath ./config.yml -cdbConfigFilepath ./config.cdb -showParsedConfig
 ```
