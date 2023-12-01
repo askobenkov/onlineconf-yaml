@@ -129,25 +129,7 @@ func WalkByYML(obj reflect.Value, prefix string) map[string]OnlineConfItem {
 				Type:  "application/x-yaml",
 			}
 		}
-	case reflect.String:
-		o[prefix] = OnlineConfItem{
-			Key:   prefix,
-			Value: fmt.Sprintf("%v", obj.Interface()),
-			Type:  "text/plain",
-		}
-	case reflect.Float64:
-		o[prefix] = OnlineConfItem{
-			Key:   prefix,
-			Value: fmt.Sprintf("%v", obj.Interface()),
-			Type:  "text/plain",
-		}
-	case reflect.Int:
-		o[prefix] = OnlineConfItem{
-			Key:   prefix,
-			Value: fmt.Sprintf("%v", obj.Interface()),
-			Type:  "text/plain",
-		}
-	case reflect.Bool:
+	case reflect.String, reflect.Float64, reflect.Int, reflect.Bool:
 		o[prefix] = OnlineConfItem{
 			Key:   prefix,
 			Value: fmt.Sprintf("%v", obj.Interface()),

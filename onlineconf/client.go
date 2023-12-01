@@ -156,7 +156,7 @@ func (client *OnlineConfClient) CreateNode(item parser.OnlineConfItem, updateIfE
 				return err
 			}
 			params["version"] = strconv.Itoa(response.Version)
-			params["comment"] = "DMR-41157: saving as yml"
+			params["comment"] = "update value"
 
 			log.Printf("update key: %+v\n", item.Key)
 
