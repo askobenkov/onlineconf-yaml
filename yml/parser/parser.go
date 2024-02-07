@@ -8,7 +8,6 @@ import (
 	"os"
 	"reflect"
 	"sort"
-	"strconv"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -149,31 +148,8 @@ func GetYMLConfig(filepath string) (interface{}, error) {
 	defer readFile.Close()
 	reader := bufio.NewReader(readFile)
 	yamlProcessed := ""
-	lineNumber := 0
 	for {
 		line, err := reader.ReadString('\n')
-		if len(line) == 0 && err != nil {
-			if err == io.EOF {
-				break
-			}
-			return data, err
-		}
-		line = strings.ReplaceAll(line, ": \"", ": \"")
-
-		listRow := strings.Split(line, ":")
-		if len(listRow) == 2 {
-			listRow[1] = strings.TrimSpace(listRow[1])
-			if listRow[1] != "" {
-				if _, err := strconv.Atoi(listRow[1]); err != nil {
-					listRow[1] = strings.ReplaceAll(listRow[1], "'", "")
-					listRow[1] = strings.ReplaceAll(listRow[1], "\"", "")
-					listRow[1] = fmt.Sprintf("'%s'", listRow[1])
-				}
-			}
-			line = strings.Join(listRow, ": ") + "\n"
-		}
-		lineNumber++
-
 		if err != nil {
 			if err == io.EOF {
 				break
