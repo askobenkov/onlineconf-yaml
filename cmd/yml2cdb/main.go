@@ -37,7 +37,7 @@ func main() {
 	}
 
 	obj := reflect.ValueOf(&data)
-	src := parser.WalkByYML(obj, "")
+	src := parser.WalkByYML(obj, "", true)
 
 	params := make([]cdb.WriteItem, len(src))
 	for k, v := range src {

@@ -78,17 +78,17 @@ func GetNodeKeysForDelete(config map[string]OnlineConfItem) []string {
 	return nodeKeys
 }
 
-func WalkByYML(obj reflect.Value, prefix string) map[string]OnlineConfItem {
+func WalkByYML(obj reflect.Value, prefix string, storeNodes bool) map[string]OnlineConfItem {
 	o := make(map[string]OnlineConfItem)
 	switch obj.Kind() {
 	case reflect.Ptr:
-		res := WalkByYML(obj.Elem(), "")
+		res := WalkByYML(obj.Elem(), "", storeNodes)
 		o = mergeMaps(o, res)
 	case reflect.Interface:
-		res := WalkByYML(obj.Elem(), prefix)
+		res := WalkByYML(obj.Elem(), prefix, storeNodes)
 		o = mergeMaps(o, res)
 	case reflect.Map:
-		if prefix != "" {
+		if storeNodes && prefix != "" {
 			childrenKeys := []string{}
 			for _, key := range obj.MapKeys() {
 				p := key.Elem().String()
@@ -117,7 +117,7 @@ func WalkByYML(obj reflect.Value, prefix string) map[string]OnlineConfItem {
 				//				log.Printf("================> %+v", key.Elem())
 				//				log.Printf("================> %+v", key.Elem())
 			}
-			res := WalkByYML(obj.MapIndex(key), p)
+			res := WalkByYML(obj.MapIndex(key), p, storeNodes)
 			//			o[prefix] = res
 			o = mergeMaps(o, res)
 		}
