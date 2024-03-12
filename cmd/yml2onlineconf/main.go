@@ -49,7 +49,7 @@ func main() {
 	}
 
 	obj := reflect.ValueOf(&data)
-	src := parser.WalkByYML(obj, "")
+	src := parser.WalkByYML(obj, "", false)
 
 	if *showParsedConfig {
 		for k, v := range src {

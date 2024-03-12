@@ -2,6 +2,7 @@ package parser
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -77,16 +78,34 @@ func GetNodeKeysForDelete(config map[string]OnlineConfItem) []string {
 	return nodeKeys
 }
 
-func WalkByYML(obj reflect.Value, prefix string) map[string]OnlineConfItem {
+func WalkByYML(obj reflect.Value, prefix string, storeNodes bool) map[string]OnlineConfItem {
 	o := make(map[string]OnlineConfItem)
 	switch obj.Kind() {
 	case reflect.Ptr:
-		res := WalkByYML(obj.Elem(), "")
+		res := WalkByYML(obj.Elem(), "", storeNodes)
 		o = mergeMaps(o, res)
 	case reflect.Interface:
-		res := WalkByYML(obj.Elem(), prefix)
+		res := WalkByYML(obj.Elem(), prefix, storeNodes)
 		o = mergeMaps(o, res)
 	case reflect.Map:
+		if storeNodes && prefix != "" {
+			childrenKeys := []string{}
+			for _, key := range obj.MapKeys() {
+				p := key.Elem().String()
+				childrenKeys = append(childrenKeys, p)
+			}
+			jsonBytes, err := json.Marshal(childrenKeys)
+			if err != nil {
+				log.Printf("Can't marshal node keys for the '%s': %s", prefix, err.Error())
+				break
+			}
+			nodePrefix := prefix + "."
+			o[nodePrefix] = OnlineConfItem{
+				Key:   nodePrefix,
+				Value: string(jsonBytes),
+				Type:  "application/x-yaml",
+			}
+		}
 		for _, key := range obj.MapKeys() {
 			p := key.Elem().String()
 			if prefix != "" {
@@ -98,7 +117,7 @@ func WalkByYML(obj reflect.Value, prefix string) map[string]OnlineConfItem {
 				//				log.Printf("================> %+v", key.Elem())
 				//				log.Printf("================> %+v", key.Elem())
 			}
-			res := WalkByYML(obj.MapIndex(key), p)
+			res := WalkByYML(obj.MapIndex(key), p, storeNodes)
 			//			o[prefix] = res
 			o = mergeMaps(o, res)
 		}
