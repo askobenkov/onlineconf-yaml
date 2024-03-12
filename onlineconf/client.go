@@ -114,7 +114,7 @@ func (client *OnlineConfClient) CreateEmptyNode(key string, skipAlreadyExist boo
 	return err
 }
 
-func (client *OnlineConfClient) CreateNode(item parser.OnlineConfItem, updateIfExists bool) error {
+func (client *OnlineConfClient) CreateNode(item parser.OnlineConfItem, updateIfExists bool, skipAlreadyExist bool) error {
 
 	params := map[string]string{
 		"summary":      "",
@@ -165,6 +165,10 @@ func (client *OnlineConfClient) CreateNode(item parser.OnlineConfItem, updateIfE
 			if err != nil {
 				return err
 			}
+			return nil
+		}
+
+		if statusCode == http.StatusBadRequest && skipAlreadyExist {
 			return nil
 		}
 
