@@ -99,10 +99,11 @@ func WalkByYML(obj reflect.Value, prefix string) map[string]OnlineConfItem {
 				log.Printf("Can't marshal node keys for the '%s': %s", prefix, err.Error())
 				break
 			}
-			o[prefix] = OnlineConfItem{
-				Key:   prefix,
+			nodePrefix := prefix + "."
+			o[nodePrefix] = OnlineConfItem{
+				Key:   nodePrefix,
 				Value: string(jsonBytes),
-				Type:  "application/json",
+				Type:  "application/x-yaml",
 			}
 		}
 		for _, key := range obj.MapKeys() {
