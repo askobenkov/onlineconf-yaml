@@ -2,6 +2,7 @@ package parser
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -87,6 +88,23 @@ func WalkByYML(obj reflect.Value, prefix string) map[string]OnlineConfItem {
 		res := WalkByYML(obj.Elem(), prefix)
 		o = mergeMaps(o, res)
 	case reflect.Map:
+		if prefix != "" {
+			childrenKeys := []string{}
+			for _, key := range obj.MapKeys() {
+				p := key.Elem().String()
+				childrenKeys = append(childrenKeys, p)
+			}
+			jsonBytes, err := json.Marshal(childrenKeys)
+			if err != nil {
+				log.Printf("Can't marshal node keys for the '%s': %s", prefix, err.Error())
+				break
+			}
+			o[prefix] = OnlineConfItem{
+				Key:   prefix,
+				Value: string(jsonBytes),
+				Type:  "application/json",
+			}
+		}
 		for _, key := range obj.MapKeys() {
 			p := key.Elem().String()
 			if prefix != "" {
