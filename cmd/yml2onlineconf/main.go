@@ -73,7 +73,7 @@ func main() {
 
 		for _, v := range src {
 
-			err = client.CreateNode(v, *updateIfExists)
+			err = client.CreateNode(v, *updateIfExists, *skipAlreadyExist)
 			if err != nil {
 				log.Fatal(err)
 			}
