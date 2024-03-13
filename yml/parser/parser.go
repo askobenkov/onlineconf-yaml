@@ -94,6 +94,7 @@ func WalkByYML(obj reflect.Value, prefix string, storeNodes bool) map[string]Onl
 				p := key.Elem().String()
 				childrenKeys = append(childrenKeys, p)
 			}
+			sort.Strings(childrenKeys)
 			jsonBytes, err := json.Marshal(childrenKeys)
 			if err != nil {
 				log.Printf("Can't marshal node keys for the '%s': %s", prefix, err.Error())
