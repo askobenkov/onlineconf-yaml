@@ -20,6 +20,7 @@ const UrlPrefix = "config"
 type OnlineConfClient struct {
 	host    string
 	headers map[string]string
+	comment string
 }
 
 type OnlineConfResponse struct {
@@ -53,6 +54,11 @@ func NewOnlineConfClient(
 	}
 
 	return client, nil
+}
+
+func (client *OnlineConfClient) SetComment(msg string) *OnlineConfClient {
+	client.comment = msg
+	return client
 }
 
 func (client *OnlineConfClient) GetHeaders(filepath string) (map[string]string, error) {
@@ -92,6 +98,9 @@ func (client *OnlineConfClient) CreateEmptyNode(key string, skipAlreadyExist boo
 		"data":         "",
 		"comment":      "init key",
 	}
+	if client.comment != "" {
+		params["comment"] = client.comment
+	}
 
 	statusCode, result, err := client.request(key, http.MethodPost, params)
 	log.Printf("init key %s, status: %+v, result: %+v, err: %+v\n", key, statusCode, result, err)
@@ -123,6 +132,9 @@ func (client *OnlineConfClient) CreateNode(item parser.OnlineConfItem, updateIfE
 		"mime":         item.Type,
 		"data":         item.Value,
 		"comment":      "init value",
+	}
+	if client.comment != "" {
+		params["comment"] = client.comment
 	}
 
 	log.Printf("creation key: %+v\n", item.Key)
@@ -156,7 +168,6 @@ func (client *OnlineConfClient) CreateNode(item parser.OnlineConfItem, updateIfE
 				return err
 			}
 			params["version"] = strconv.Itoa(response.Version)
-			params["comment"] = "update value"
 
 			log.Printf("update key: %+v\n", item.Key)
 
@@ -195,6 +206,10 @@ func (client *OnlineConfClient) DeleteNode(key string) error {
 	params := map[string]string{
 		"version": strconv.Itoa(response.Version),
 		"comment": "autoremove value",
+	}
+
+	if client.comment != "" {
+		params["comment"] = client.comment
 	}
 
 	log.Printf("delete key: %+v\n", key)

@@ -27,6 +27,7 @@ func main() {
 	skipAlreadyExist := flag.Bool("skipAlreadyExist", false, "Skip already exist error")
 	skipCreateNode := flag.Bool("skipCreateNode", false, "Skip create node")
 	basicAuthKey := flag.String("basicAuthKey", "", "Basic autorization key (docker only)")
+	comment := flag.String("comment", "", "Comment message")
 
 	flag.Parse()
 
@@ -64,7 +65,7 @@ func main() {
 			log.Printf("client.CreateEmptyNode..")
 
 			for _, key := range nodeKeys {
-				err := client.CreateEmptyNode(key, *skipAlreadyExist)
+				err := client.SetComment(*comment).CreateEmptyNode(key, *skipAlreadyExist)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -73,7 +74,7 @@ func main() {
 
 		for _, v := range src {
 
-			err = client.CreateNode(v, *updateIfExists, *skipAlreadyExist)
+			err = client.SetComment(*comment).CreateNode(v, *updateIfExists, *skipAlreadyExist)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -85,7 +86,7 @@ func main() {
 		log.Printf("delete =============> %+v\n", nodeKeys)
 
 		for _, key := range nodeKeys {
-			err := client.DeleteNode(key)
+			err := client.SetComment(*comment).DeleteNode(key)
 			if err != nil {
 				log.Fatal(err)
 			}
