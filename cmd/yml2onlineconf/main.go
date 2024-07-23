@@ -37,7 +37,7 @@ func main() {
 
 	*onlineConfUrl = regexp.MustCompile(`/+$`).ReplaceAllString(*onlineConfUrl, "")
 	client, err := client.NewOnlineConfClient(
-		fmt.Sprintf("%s/%s/%s", *onlineConfUrl, client.UrlPrefix, *mainNodeName),
+		fmt.Sprintf("%s/%s/%s", *onlineConfUrl, client.URLPrefix, *mainNodeName),
 		*headersFilepath,
 		*basicAuthKey,
 	)

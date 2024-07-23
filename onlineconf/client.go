@@ -15,19 +15,23 @@ import (
 	"strings"
 )
 
-const UrlPrefix = "config"
+// URLPrefix prefix url constant
+const URLPrefix = "config"
 
+// OnlineConfClient onlineconf client
 type OnlineConfClient struct {
 	host    string
 	headers map[string]string
 }
 
+// OnlineConfResponse onlineconf response
 type OnlineConfResponse struct {
 	Error   string
 	Version int
 	Message string
 }
 
+// NewOnlineConfClient create onlineconf client
 func NewOnlineConfClient(
 	host string,
 	filepathHeader string,
@@ -55,6 +59,7 @@ func NewOnlineConfClient(
 	return client, nil
 }
 
+// GetHeaders return headers
 func (client *OnlineConfClient) GetHeaders(filepath string) (map[string]string, error) {
 
 	headers := map[string]string{}
