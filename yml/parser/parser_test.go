@@ -92,7 +92,7 @@ fee:
 		},
 		"fee/volatile/VR/1006-1001-1001.": {
 			Key:   "fee/volatile/VR/1006-1001-1001.",
-			Value: "[\"KEY3\",\"KEY2\"]",
+			Value: "[\"KEY2\",\"KEY3\"]",
 			Type:  "application/x-yaml",
 		},
 		"fee/volatile/VR/1006-1001-1001/KEY3": {
