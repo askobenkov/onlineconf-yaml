@@ -67,7 +67,7 @@ func main() {
 			log.Printf("client.CreateEmptyNode..")
 
 			for _, key := range nodeKeys {
-				err := client.SetComment(*comment).CreateEmptyNode(key, *skipAlreadyExist)
+				err := client.CreateEmptyNode(key, *skipAlreadyExist, *comment)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -76,7 +76,7 @@ func main() {
 
 		for _, v := range src {
 
-			err = client.SetComment(*comment).CreateNode(v, *updateIfExists, *skipAlreadyExist)
+			err = client.CreateNode(v, *updateIfExists, *skipAlreadyExist, *comment)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -88,7 +88,7 @@ func main() {
 		log.Printf("delete =============> %+v\n", nodeKeys)
 
 		for _, key := range nodeKeys {
-			err := client.SetComment(*comment).DeleteNode(key)
+			err := client.DeleteNode(key, *comment)
 			if err != nil {
 				log.Fatal(err)
 			}

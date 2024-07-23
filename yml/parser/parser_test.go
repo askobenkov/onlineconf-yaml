@@ -15,27 +15,27 @@ func TestParser(t *testing.T) {
 	cfgFilepath, err := writeYMLConfig(`
 fee:
   common:
-    RUR:
-      "1001-9001-3049-1111":
-        TOBLRBNK:
+    R:
+      "1001-1001-1001":
+        KEY1:
           - fee: 4
-            pmtype: FEETOBLRBNK
+            pmtype: FEEKEY1
             subject: "Simple fee"
   volatile:
-    VRUR:
-      "1001-9001-3049-1111":
-        TOBLRBNK:
+    VR:
+      "1001-1001-1001":
+        KEY1:
           - fee: 4
-            pmtype: FEETOBLRBNK
+            pmtype: FEEKEY1
             subject: "Simple fee"
-      "1006-0001-5761-2222":
-        TOSBRTR1:
+      "1006-1001-1001":
+        KEY3:
           - fee: 2.15
-            pmtype: FEETOSBRTR1
+            pmtype: FEEKEY3
             subject: "Simple fee"
-        TOSBRTR2:
+        KEY2:
           - fee: 2.15
-            pmtype: FEETOSBRTR2
+            pmtype: FEEKEY2
             subject: "Simple fee"
 `)
 
@@ -52,57 +52,57 @@ fee:
 		},
 		"fee/common.": {
 			Key:   "fee/common.",
-			Value: "[\"RUR\"]",
+			Value: "[\"R\"]",
 			Type:  "application/x-yaml",
 		},
-		"fee/common/RUR.": {
-			Key:   "fee/common/RUR.",
-			Value: "[\"1001-9001-3049-1111\"]",
+		"fee/common/R.": {
+			Key:   "fee/common/R.",
+			Value: "[\"1001-1001-1001\"]",
 			Type:  "application/x-yaml",
 		},
-		"fee/common/RUR/1001-9001-3049-1111.": {
-			Key:   "fee/common/RUR/1001-9001-3049-1111.",
-			Value: "[\"TOBLRBNK\"]",
+		"fee/common/R/1001-1001-1001.": {
+			Key:   "fee/common/R/1001-1001-1001.",
+			Value: "[\"KEY1\"]",
 			Type:  "application/x-yaml",
 		},
-		"fee/common/RUR/1001-9001-3049-1111/TOBLRBNK": {
-			Key:   "fee/common/RUR/1001-9001-3049-1111/TOBLRBNK",
-			Value: "- fee: 4\n  pmtype: FEETOBLRBNK\n  subject: Simple fee\n",
+		"fee/common/R/1001-1001-1001/KEY1": {
+			Key:   "fee/common/R/1001-1001-1001/KEY1",
+			Value: "- fee: 4\n  pmtype: FEEKEY1\n  subject: Simple fee\n",
 			Type:  "application/x-yaml",
 		},
 		"fee/volatile.": {
 			Key:   "fee/volatile.",
-			Value: "[\"VRUR\"]",
+			Value: "[\"VR\"]",
 			Type:  "application/x-yaml",
 		},
-		"fee/volatile/VRUR.": {
-			Key:   "fee/volatile/VRUR.",
-			Value: "[\"1001-9001-3049-1111\",\"1006-0001-5761-2222\"]",
+		"fee/volatile/VR.": {
+			Key:   "fee/volatile/VR.",
+			Value: "[\"1001-1001-1001\",\"1006-1001-1001\"]",
 			Type:  "application/x-yaml",
 		},
-		"fee/volatile/VRUR/1001-9001-3049-1111.": {
-			Key:   "fee/volatile/VRUR/1001-9001-3049-1111.",
-			Value: "[\"TOBLRBNK\"]",
+		"fee/volatile/VR/1001-1001-1001.": {
+			Key:   "fee/volatile/VR/1001-1001-1001.",
+			Value: "[\"KEY1\"]",
 			Type:  "application/x-yaml",
 		},
-		"fee/volatile/VRUR/1001-9001-3049-1111/TOBLRBNK": {
-			Key:   "fee/volatile/VRUR/1001-9001-3049-1111/TOBLRBNK",
-			Value: "- fee: 4\n  pmtype: FEETOBLRBNK\n  subject: Simple fee\n",
+		"fee/volatile/VR/1001-1001-1001/KEY1": {
+			Key:   "fee/volatile/VR/1001-1001-1001/KEY1",
+			Value: "- fee: 4\n  pmtype: FEEKEY1\n  subject: Simple fee\n",
 			Type:  "application/x-yaml",
 		},
-		"fee/volatile/VRUR/1006-0001-5761-2222.": {
-			Key:   "fee/volatile/VRUR/1006-0001-5761-2222.",
-			Value: "[\"TOSBRTR1\",\"TOSBRTR2\"]",
+		"fee/volatile/VR/1006-1001-1001.": {
+			Key:   "fee/volatile/VR/1006-1001-1001.",
+			Value: "[\"KEY3\",\"KEY2\"]",
 			Type:  "application/x-yaml",
 		},
-		"fee/volatile/VRUR/1006-0001-5761-2222/TOSBRTR1": {
-			Key:   "fee/volatile/VRUR/1006-0001-5761-2222/TOSBRTR1",
-			Value: "- fee: 2.15\n  pmtype: FEETOSBRTR1\n  subject: Simple fee\n",
+		"fee/volatile/VR/1006-1001-1001/KEY3": {
+			Key:   "fee/volatile/VR/1006-1001-1001/KEY3",
+			Value: "- fee: 2.15\n  pmtype: FEEKEY3\n  subject: Simple fee\n",
 			Type:  "application/x-yaml",
 		},
-		"fee/volatile/VRUR/1006-0001-5761-2222/TOSBRTR2": {
-			Key:   "fee/volatile/VRUR/1006-0001-5761-2222/TOSBRTR2",
-			Value: "- fee: 2.15\n  pmtype: FEETOSBRTR2\n  subject: Simple fee\n",
+		"fee/volatile/VR/1006-1001-1001/KEY2": {
+			Key:   "fee/volatile/VR/1006-1001-1001/KEY2",
+			Value: "- fee: 2.15\n  pmtype: FEEKEY2\n  subject: Simple fee\n",
 			Type:  "application/x-yaml",
 		},
 	}
