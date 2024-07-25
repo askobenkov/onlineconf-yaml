@@ -89,14 +89,14 @@ func (client *OnlineConfClient) GetHeaders(filepath string) (map[string]string, 
 }
 
 // CreateEmptyNode creating empty node
-func (client *OnlineConfClient) CreateEmptyNode(key string, skipAlreadyExist bool) error {
+func (client *OnlineConfClient) CreateEmptyNode(key string, skipAlreadyExist bool, comment string) error {
 	params := map[string]string{
 		"summary":      "",
 		"description":  "",
 		"notification": "",
 		"mime":         "application/x-null",
 		"data":         "",
-		"comment":      "init key",
+		"comment":      comment,
 	}
 
 	statusCode, result, err := client.request(key, http.MethodPost, params)
@@ -121,7 +121,7 @@ func (client *OnlineConfClient) CreateEmptyNode(key string, skipAlreadyExist boo
 }
 
 // CreateNode create node
-func (client *OnlineConfClient) CreateNode(item parser.OnlineConfItem, updateIfExists bool, skipAlreadyExist bool) error {
+func (client *OnlineConfClient) CreateNode(item parser.OnlineConfItem, updateIfExists bool, skipAlreadyExist bool, comment string) error {
 
 	params := map[string]string{
 		"summary":      "",
@@ -129,7 +129,7 @@ func (client *OnlineConfClient) CreateNode(item parser.OnlineConfItem, updateIfE
 		"notification": "",
 		"mime":         item.Type,
 		"data":         item.Value,
-		"comment":      "init value",
+		"comment":      comment,
 	}
 
 	log.Printf("creation key: %+v\n", item.Key)
@@ -163,7 +163,6 @@ func (client *OnlineConfClient) CreateNode(item parser.OnlineConfItem, updateIfE
 				return err
 			}
 			params["version"] = strconv.Itoa(response.Version)
-			params["comment"] = "update value"
 
 			log.Printf("update key: %+v\n", item.Key)
 
@@ -185,7 +184,7 @@ func (client *OnlineConfClient) CreateNode(item parser.OnlineConfItem, updateIfE
 }
 
 // DeleteNode delete node
-func (client *OnlineConfClient) DeleteNode(key string) error {
+func (client *OnlineConfClient) DeleteNode(key string, comment string) error {
 
 	statusCode, result, err := client.request(key, http.MethodGet, nil)
 	if statusCode != http.StatusOK {
@@ -202,7 +201,7 @@ func (client *OnlineConfClient) DeleteNode(key string) error {
 
 	params := map[string]string{
 		"version": strconv.Itoa(response.Version),
-		"comment": "autoremove value",
+		"comment": comment,
 	}
 
 	log.Printf("delete key: %+v\n", key)
