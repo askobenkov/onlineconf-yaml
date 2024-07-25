@@ -15,20 +15,24 @@ import (
 	"strings"
 )
 
-const UrlPrefix = "config"
+// URLPrefix prefix url constant
+const URLPrefix = "config"
 
+// OnlineConfClient onlineconf client
 type OnlineConfClient struct {
 	host    string
 	headers map[string]string
 	comment string
 }
 
+// OnlineConfResponse onlineconf response
 type OnlineConfResponse struct {
 	Error   string
 	Version int
 	Message string
 }
 
+// NewOnlineConfClient create onlineconf client
 func NewOnlineConfClient(
 	host string,
 	filepathHeader string,
@@ -56,11 +60,13 @@ func NewOnlineConfClient(
 	return client, nil
 }
 
+// SetComment set comment
 func (client *OnlineConfClient) SetComment(msg string) *OnlineConfClient {
 	client.comment = msg
 	return client
 }
 
+// GetHeaders return headers
 func (client *OnlineConfClient) GetHeaders(filepath string) (map[string]string, error) {
 
 	headers := map[string]string{}
@@ -89,6 +95,7 @@ func (client *OnlineConfClient) GetHeaders(filepath string) (map[string]string, 
 	return headers, nil
 }
 
+// CreateEmptyNode creating empty node
 func (client *OnlineConfClient) CreateEmptyNode(key string, skipAlreadyExist bool) error {
 	params := map[string]string{
 		"summary":      "",
@@ -123,6 +130,7 @@ func (client *OnlineConfClient) CreateEmptyNode(key string, skipAlreadyExist boo
 	return err
 }
 
+// CreateNode create node
 func (client *OnlineConfClient) CreateNode(item parser.OnlineConfItem, updateIfExists bool, skipAlreadyExist bool) error {
 
 	params := map[string]string{
@@ -188,6 +196,7 @@ func (client *OnlineConfClient) CreateNode(item parser.OnlineConfItem, updateIfE
 	return err
 }
 
+// DeleteNode delete node
 func (client *OnlineConfClient) DeleteNode(key string) error {
 
 	statusCode, result, err := client.request(key, http.MethodGet, nil)
@@ -226,7 +235,7 @@ func (client *OnlineConfClient) DeleteNode(key string) error {
 }
 
 func (client *OnlineConfClient) request(
-	requestUrl string,
+	requestURL string,
 	method string,
 	params map[string]string,
 ) (int, string, error) {
@@ -245,7 +254,7 @@ func (client *OnlineConfClient) request(
 		reader = strings.NewReader(requestParams.Encode())
 	}
 
-	url := fmt.Sprintf("%s/%s", client.host, requestUrl)
+	url := fmt.Sprintf("%s/%s", client.host, requestURL)
 
 	req, err := http.NewRequest(method, url, reader)
 	if err != nil {
