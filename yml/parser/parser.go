@@ -14,12 +14,14 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// OnlineConfItem onlineconf node
 type OnlineConfItem struct {
 	Key   string
 	Value string
 	Type  string
 }
 
+// GetParentNodeKeys getting parent node keys
 func GetParentNodeKeys(config map[string]OnlineConfItem) []string {
 	nodes := map[string]bool{}
 	for k := range config {
@@ -49,6 +51,7 @@ func GetParentNodeKeys(config map[string]OnlineConfItem) []string {
 	return nodeKeys
 }
 
+// GetNodeKeysForDelete getting node for delete
 func GetNodeKeysForDelete(config map[string]OnlineConfItem) []string {
 	nodes := map[string]bool{}
 	for k := range config {
@@ -78,6 +81,7 @@ func GetNodeKeysForDelete(config map[string]OnlineConfItem) []string {
 	return nodeKeys
 }
 
+// WalkByYML walk by yml
 func WalkByYML(obj reflect.Value, prefix string, storeNodes bool) map[string]OnlineConfItem {
 	o := make(map[string]OnlineConfItem)
 	switch obj.Kind() {
@@ -158,6 +162,7 @@ func WalkByYML(obj reflect.Value, prefix string, storeNodes bool) map[string]Onl
 	return o
 }
 
+// GetYMLConfig get yml config
 func GetYMLConfig(filepath string) (interface{}, error) {
 	var data interface{}
 
