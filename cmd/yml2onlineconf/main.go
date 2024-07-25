@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"reflect"
+	"regexp"
 
 	"log"
 
@@ -34,6 +35,7 @@ func main() {
 		log.Fatal(fmt.Errorf("import filepath config is empty"))
 	}
 
+	*onlineConfUrl = regexp.MustCompile(`/+$`).ReplaceAllString(*onlineConfUrl, "")
 	client, err := client.NewOnlineConfClient(
 		fmt.Sprintf("%s/%s/%s", *onlineConfUrl, client.UrlPrefix, *mainNodeName),
 		*headersFilepath,
