@@ -62,6 +62,10 @@ jobs:
           PKG_VER=$(cat version.txt)
           RELEASE_ID=$(date +%Y%m%d)
           
+          sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo
+          sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/*.repo
+          sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/*.repo
+
           yum clean all
           yum install -y yum-utils
           yum-config-manager --add-repo https://mirror.go-repo.io/centos/go-repo.repo
