@@ -105,7 +105,8 @@ jobs:
       id: rpm
       run: |
         cd REPO
-        echo "name=$(ls -t *.rpm | head -1)" >> $GITHUB_OUTPUT
+        echo "el7_name=$(ls -t *.rpm | grep 'el7' | head -1)" >> $GITHUB_OUTPUT
+        echo "el9_name=$(ls -t *.rpm | grep 'el9' | head -1)" >> $GITHUB_OUTPUT
         echo "version=$(cat version.txt)" >> $GITHUB_OUTPUT
         echo "release_version=v$(cat version.txt)" >> $GITHUB_OUTPUT
 
@@ -120,13 +121,24 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: Upload release asset
-      id: upload-release-asset
+    - name: Upload release asset el7
+      id: upload-release-asset-el7
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GO_RELEASER_GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ github.workspace }}/REPO/${{ steps.rpm.outputs.name }}
-        asset_name: ${{ steps.rpm.outputs.name }}
+        asset_path: ${{ github.workspace }}/REPO/${{ steps.rpm.outputs.el7_name }}
+        asset_name: ${{ steps.rpm.outputs.el7_name }}
+        asset_content_type: application/octet-stream
+
+    - name: Upload release asset el9
+      id: upload-release-asset-el9
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GO_RELEASER_GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/REPO/${{ steps.rpm.outputs.el9_name }}
+        asset_name: ${{ steps.rpm.outputs.el9_name }}
         asset_content_type: application/octet-stream
