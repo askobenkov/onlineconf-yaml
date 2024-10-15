@@ -56,7 +56,7 @@ jobs:
       uses: addnab/docker-run-action@v3
       with:
         image: centos:7
-        options: -v ${{ github.workspace }}:/onlineconf-yaml -e PKG_NAME=onlineconf-yaml
+        options: -v ${{ github.workspace }}:/onlineconf-yaml -e PKG_NAME=onlineconf-yaml -e GITHUB_RUN_ID=${{ github.run_id }}
         run: |
           cd /onlineconf-yaml/REPO
           PKG_VER=$(cat version.txt)
@@ -82,7 +82,7 @@ jobs:
       uses: addnab/docker-run-action@v3
       with:
         image: almalinux:9
-        options: -v ${{ github.workspace }}:/onlineconf-yaml -e PKG_NAME=onlineconf-yaml
+        options: -v ${{ github.workspace }}:/onlineconf-yaml -e PKG_NAME=onlineconf-yaml -e GITHUB_RUN_ID=${{ github.run_id }}
         run: |
           cd /onlineconf-yaml/REPO
           PKG_VER=$(cat version.txt)
