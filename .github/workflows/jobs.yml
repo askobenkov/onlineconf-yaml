@@ -93,10 +93,7 @@ jobs:
           sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/*.repo
 
           yum clean all
-          yum install -y yum-utils
-          yum-config-manager --add-repo https://mirror.go-repo.io/centos/go-repo.repo
-          yum update -y --nogpgcheck
-          yum install -y --nogpgcheck rpm-build git make which pkgconfig systemd-devel rpmlint golang
+          yum install -y --nogpgcheck yum-utils rpm-build git make which pkgconfig systemd-devel rpmlint golang
 
           git archive --format=tar HEAD --prefix="${PKG_NAME}-${PKG_VER}/" | gzip > "${PKG_NAME}-${PKG_VER}.tar.gz"
           yum-builddep -y "${PKG_NAME}.spec"
