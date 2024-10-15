@@ -4,7 +4,6 @@ LDFLAGS="-X \"main.versionInfo=$(shell cat version.txt)-${GITHUB_RUN_ID}-$(shell
 .PHONY: test
 
 build:
-	env
 	$(GO) build -ldflags $(LDFLAGS) -mod=vendor -o $(GOPATH)/bin/yml2cdb cmd/yml2cdb/*
 	$(GO) build -ldflags $(LDFLAGS) -mod=vendor -o $(GOPATH)/bin/yml2onlineconf cmd/yml2onlineconf/*
 
