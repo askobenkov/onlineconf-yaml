@@ -95,7 +95,7 @@ jobs:
           yum clean all
           yum install -y --nogpgcheck yum-utils rpm-build git make which pkgconfig systemd-devel rpmlint golang
 
-          git archive --format=tar HEAD --prefix="${PKG_NAME}-${PKG_VER}/" | gzip > "${PKG_NAME}-${PKG_VER}.tar.gz"
+          # "${PKG_NAME}-${PKG_VER}.tar.gz" already exists after previous step
           yum-builddep -y "${PKG_NAME}.spec"
           rpmbuild -ba --define "_sourcedir $PWD" --define "__version $PKG_VER" --define "__release $RELEASE_ID" "${PKG_NAME}.spec"
           mv $HOME/rpmbuild/RPMS/x86_64/*rpm ./
