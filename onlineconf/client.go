@@ -15,19 +15,23 @@ import (
 	"strings"
 )
 
-const UrlPrefix = "config"
+// URLPrefix prefix url constant
+const URLPrefix = "config"
 
+// OnlineConfClient onlineconf client
 type OnlineConfClient struct {
 	host    string
 	headers map[string]string
 }
 
+// OnlineConfResponse onlineconf response
 type OnlineConfResponse struct {
 	Error   string
 	Version int
 	Message string
 }
 
+// NewOnlineConfClient create onlineconf client
 func NewOnlineConfClient(
 	host string,
 	filepathHeader string,
@@ -55,6 +59,7 @@ func NewOnlineConfClient(
 	return client, nil
 }
 
+// GetHeaders return headers
 func (client *OnlineConfClient) GetHeaders(filepath string) (map[string]string, error) {
 
 	headers := map[string]string{}
@@ -83,14 +88,15 @@ func (client *OnlineConfClient) GetHeaders(filepath string) (map[string]string, 
 	return headers, nil
 }
 
-func (client *OnlineConfClient) CreateEmptyNode(key string, skipAlreadyExist bool) error {
+// CreateEmptyNode creating empty node
+func (client *OnlineConfClient) CreateEmptyNode(key string, skipAlreadyExist bool, comment string) error {
 	params := map[string]string{
 		"summary":      "",
 		"description":  "",
 		"notification": "",
 		"mime":         "application/x-null",
 		"data":         "",
-		"comment":      "init key",
+		"comment":      comment,
 	}
 
 	statusCode, result, err := client.request(key, http.MethodPost, params)
@@ -114,7 +120,8 @@ func (client *OnlineConfClient) CreateEmptyNode(key string, skipAlreadyExist boo
 	return err
 }
 
-func (client *OnlineConfClient) CreateNode(item parser.OnlineConfItem, updateIfExists bool) error {
+// CreateNode create node
+func (client *OnlineConfClient) CreateNode(item parser.OnlineConfItem, updateIfExists bool, skipAlreadyExist bool, comment string) error {
 
 	params := map[string]string{
 		"summary":      "",
@@ -122,7 +129,7 @@ func (client *OnlineConfClient) CreateNode(item parser.OnlineConfItem, updateIfE
 		"notification": "",
 		"mime":         item.Type,
 		"data":         item.Value,
-		"comment":      "init value",
+		"comment":      comment,
 	}
 
 	log.Printf("creation key: %+v\n", item.Key)
@@ -156,7 +163,6 @@ func (client *OnlineConfClient) CreateNode(item parser.OnlineConfItem, updateIfE
 				return err
 			}
 			params["version"] = strconv.Itoa(response.Version)
-			params["comment"] = "update value"
 
 			log.Printf("update key: %+v\n", item.Key)
 
@@ -168,12 +174,17 @@ func (client *OnlineConfClient) CreateNode(item parser.OnlineConfItem, updateIfE
 			return nil
 		}
 
+		if statusCode == http.StatusBadRequest && skipAlreadyExist {
+			return nil
+		}
+
 		return err
 	}
 	return err
 }
 
-func (client *OnlineConfClient) DeleteNode(key string) error {
+// DeleteNode delete node
+func (client *OnlineConfClient) DeleteNode(key string, comment string) error {
 
 	statusCode, result, err := client.request(key, http.MethodGet, nil)
 	if statusCode != http.StatusOK {
@@ -190,7 +201,7 @@ func (client *OnlineConfClient) DeleteNode(key string) error {
 
 	params := map[string]string{
 		"version": strconv.Itoa(response.Version),
-		"comment": "autoremove value",
+		"comment": comment,
 	}
 
 	log.Printf("delete key: %+v\n", key)
@@ -207,7 +218,7 @@ func (client *OnlineConfClient) DeleteNode(key string) error {
 }
 
 func (client *OnlineConfClient) request(
-	requestUrl string,
+	requestURL string,
 	method string,
 	params map[string]string,
 ) (int, string, error) {
@@ -226,7 +237,7 @@ func (client *OnlineConfClient) request(
 		reader = strings.NewReader(requestParams.Encode())
 	}
 
-	url := fmt.Sprintf("%s/%s", client.host, requestUrl)
+	url := fmt.Sprintf("%s/%s", client.host, requestURL)
 
 	req, err := http.NewRequest(method, url, reader)
 	if err != nil {

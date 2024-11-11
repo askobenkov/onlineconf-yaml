@@ -12,6 +12,7 @@ import (
 
 var floatRE = regexp.MustCompile(`^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][-+]?\d+)?$`) // RFC8259
 
+// WriteItem cdb struct
 type WriteItem struct {
 	json  bool
 	Path  string
@@ -89,6 +90,7 @@ func (v *yamlValue) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
+// YAMLToJSON - convert yaml to json
 func YAMLToJSON(y []byte) ([]byte, error) {
 	var data *yamlValue
 	err := yaml.Unmarshal(y, &data)
@@ -98,6 +100,7 @@ func YAMLToJSON(y []byte) ([]byte, error) {
 	return json.Marshal(data)
 }
 
+// Write item to filepath
 func Write(filepath string, params []WriteItem) error {
 	w, err := cdb.Create(filepath)
 	if err != nil {

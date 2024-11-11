@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"reflect"
+	"regexp"
 
 	"log"
 
@@ -12,11 +13,11 @@ import (
 )
 
 /*
-go run cmd/yml2onlineconf/main.go -onlineConfUrl https://onlineconf.local -importConfigFilepath ./importConfig.yml -headersFilepath ./headers.txt -mainNodeName importConfig -showParsedConfig -importParsedConfig
+go run cmd/yml2onlineconf/main.go -onlineConfURL https://onlineconf.local -importConfigFilepath ./importConfig.yml -headersFilepath ./headers.txt -mainNodeName importConfig -showParsedConfig -importParsedConfig
 */
 func main() {
 
-	onlineConfUrl := flag.String("onlineConfUrl", "https://onlineconf.local", "OnlineConf URL name")
+	onlineConfURL := flag.String("onlineConfURL", "https://onlineconf.local", "OnlineConf URL name")
 	configFilepath := flag.String("importConfigFilepath", "", "import config filepath")
 	headersFilepath := flag.String("headersFilepath", "", "file with raw browser headers")
 	mainNodeName := flag.String("mainNodeName", "", "OnlineConf main node name")
@@ -27,6 +28,7 @@ func main() {
 	skipAlreadyExist := flag.Bool("skipAlreadyExist", false, "Skip already exist error")
 	skipCreateNode := flag.Bool("skipCreateNode", false, "Skip create node")
 	basicAuthKey := flag.String("basicAuthKey", "", "Basic autorization key (docker only)")
+	comment := flag.String("comment", "", "Comment message")
 
 	flag.Parse()
 
@@ -34,8 +36,9 @@ func main() {
 		log.Fatal(fmt.Errorf("import filepath config is empty"))
 	}
 
+	*onlineConfURL = regexp.MustCompile(`/+$`).ReplaceAllString(*onlineConfURL, "")
 	client, err := client.NewOnlineConfClient(
-		fmt.Sprintf("%s/%s/%s", *onlineConfUrl, client.UrlPrefix, *mainNodeName),
+		fmt.Sprintf("%s/%s/%s", *onlineConfURL, client.URLPrefix, *mainNodeName),
 		*headersFilepath,
 		*basicAuthKey,
 	)
@@ -64,7 +67,7 @@ func main() {
 			log.Printf("client.CreateEmptyNode..")
 
 			for _, key := range nodeKeys {
-				err := client.CreateEmptyNode(key, *skipAlreadyExist)
+				err := client.CreateEmptyNode(key, *skipAlreadyExist, *comment)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -73,7 +76,7 @@ func main() {
 
 		for _, v := range src {
 
-			err = client.CreateNode(v, *updateIfExists)
+			err = client.CreateNode(v, *updateIfExists, *skipAlreadyExist, *comment)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -85,7 +88,7 @@ func main() {
 		log.Printf("delete =============> %+v\n", nodeKeys)
 
 		for _, key := range nodeKeys {
-			err := client.DeleteNode(key)
+			err := client.DeleteNode(key, *comment)
 			if err != nil {
 				log.Fatal(err)
 			}

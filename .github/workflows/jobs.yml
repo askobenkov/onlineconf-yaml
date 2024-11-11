@@ -52,16 +52,20 @@ jobs:
       with:
         path: "REPO"
 
-    - name: Build RPM package
+    - name: Build RPM package el7
       uses: addnab/docker-run-action@v3
       with:
         image: centos:7
-        options: -v ${{ github.workspace }}:/onlineconf-yaml -e PKG_NAME=onlineconf-yaml
+        options: -v ${{ github.workspace }}:/onlineconf-yaml -e PKG_NAME=onlineconf-yaml -e GITHUB_RUN_ID=${{ github.run_id }}
         run: |
           cd /onlineconf-yaml/REPO
           PKG_VER=$(cat version.txt)
           RELEASE_ID=$(date +%Y%m%d)
-          
+
+          sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo
+          sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/*.repo
+          sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/*.repo
+
           yum clean all
           yum install -y yum-utils
           yum-config-manager --add-repo https://mirror.go-repo.io/centos/go-repo.repo
@@ -74,11 +78,35 @@ jobs:
           mv $HOME/rpmbuild/RPMS/x86_64/*rpm ./
           mv $HOME/rpmbuild/SRPMS/*rpm ./
 
+    - name: Build RPM package el9
+      uses: addnab/docker-run-action@v3
+      with:
+        image: almalinux:9
+        options: -v ${{ github.workspace }}:/onlineconf-yaml -e PKG_NAME=onlineconf-yaml -e GITHUB_RUN_ID=${{ github.run_id }}
+        run: |
+          cd /onlineconf-yaml/REPO
+          PKG_VER=$(cat version.txt)
+          RELEASE_ID=$(date +%Y%m%d)
+
+          sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo
+          sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/*.repo
+          sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/*.repo
+
+          yum clean all
+          yum install -y --nogpgcheck yum-utils rpm-build git make which pkgconfig systemd-devel rpmlint golang
+
+          # "${PKG_NAME}-${PKG_VER}.tar.gz" already exists after previous step
+          yum-builddep -y "${PKG_NAME}.spec"
+          rpmbuild -ba --define "_sourcedir $PWD" --define "__version $PKG_VER" --define "__release $RELEASE_ID" "${PKG_NAME}.spec"
+          mv $HOME/rpmbuild/RPMS/x86_64/*rpm ./
+          mv $HOME/rpmbuild/SRPMS/*rpm ./
+
     - name: Set RPM variable
       id: rpm
       run: |
         cd REPO
-        echo "name=$(ls -t *.rpm | head -1)" >> $GITHUB_OUTPUT
+        echo "el7_name=$(ls -t *.rpm | grep 'el7' | head -1)" >> $GITHUB_OUTPUT
+        echo "el9_name=$(ls -t *.rpm | grep 'el9' | head -1)" >> $GITHUB_OUTPUT
         echo "version=$(cat version.txt)" >> $GITHUB_OUTPUT
         echo "release_version=v$(cat version.txt)" >> $GITHUB_OUTPUT
 
@@ -93,13 +121,24 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: Upload release asset
-      id: upload-release-asset
+    - name: Upload release asset el7
+      id: upload-release-asset-el7
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GO_RELEASER_GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ github.workspace }}/REPO/${{ steps.rpm.outputs.name }}
-        asset_name: ${{ steps.rpm.outputs.name }}
+        asset_path: ${{ github.workspace }}/REPO/${{ steps.rpm.outputs.el7_name }}
+        asset_name: ${{ steps.rpm.outputs.el7_name }}
+        asset_content_type: application/octet-stream
+
+    - name: Upload release asset el9
+      id: upload-release-asset-el9
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GO_RELEASER_GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/REPO/${{ steps.rpm.outputs.el9_name }}
+        asset_name: ${{ steps.rpm.outputs.el9_name }}
         asset_content_type: application/octet-stream

@@ -7,7 +7,7 @@ Name:           onlineconf-yaml
 Version:        %{__version}
 Release:        %{__release}%{?dist}
 Summary:        Utilities for сonvert yml to cdb and import yml to OnlineConf
-Group:          DMR
+Group:          OnlineConf
 License:        Proprietary
 URL:            https://github.com/askobenkov/onlineconf-yaml
 Source:         %{name}-%{version}.tar.gz
@@ -17,13 +17,6 @@ BuildRoot:      %{_tmppath}/%{name}-root
 BuildRequires:  golang
 BuildRequires:  make
 BuildRequires:  which
-BuildRequires:  pkgconfig(libsystemd-daemon)
-BuildRequires:  pkgconfig(libsystemd)
-
-Requires(pre): shadow-utils
-Requires(post):   systemd
-Requires(preun):  systemd
-Requires(postun): systemd
 
 %description
 Utilities for сonvert yml to cdb and import yml to OnlineConf

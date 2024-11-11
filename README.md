@@ -3,7 +3,7 @@
 ## yml2onlineconf - utility for import yaml config to OnlineConf by admin web interface
 
 Options:
-* onlineConfUrl - onlineconf web interface URL
+* onlineConfURL - onlineconf web interface URL
 * importConfigFilepath - filepath to yaml config
 * headersFilepath - filepath to http headers
 * mainNodeName - name of the node where the config will be imported
@@ -16,7 +16,7 @@ Options:
 
 Run:
 ```
-yml2onlineconf -onlineConfUrl https://onlineconf.local -importConfigFilepath ./importConfig.yml -headersFilepath ./headers.txt -mainNodeName importConfig -showParsedConfig -importParsedConfig
+yml2onlineconf -onlineConfURL https://onlineconf.local -importConfigFilepath ./importConfig.yml -headersFilepath ./headers.txt -mainNodeName importConfig -showParsedConfig -importParsedConfig
 ```
 
 ## yml2cdb - utility for convert yml config to cdb database
