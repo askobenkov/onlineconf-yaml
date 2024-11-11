@@ -100,12 +100,12 @@ func WalkByYML(obj reflect.Value, prefix string, storeNodes bool) map[string]Onl
 			}
 			nodePrefix := prefix + "."
 			if len(childrenKeys) > 0 {
-        sort.Strings(childrenKeys)
-        jsonBytes, err := json.Marshal(childrenKeys)
-        if err != nil {
-          log.Printf("Can't marshal node keys for the '%s': %s", prefix, err.Error())
-          break
-        }
+				sort.Strings(childrenKeys)
+				jsonBytes, err := json.Marshal(childrenKeys)
+				if err != nil {
+					log.Printf("Can't marshal node keys for the '%s': %s", prefix, err.Error())
+					break
+				}
 				o[nodePrefix] = OnlineConfItem{
 					Key:   nodePrefix,
 					Value: string(jsonBytes),
