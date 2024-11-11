@@ -94,16 +94,24 @@ func WalkByYML(obj reflect.Value, prefix string, storeNodes bool) map[string]Onl
 				p := key.Elem().String()
 				childrenKeys = append(childrenKeys, p)
 			}
-			jsonBytes, err := json.Marshal(childrenKeys)
-			if err != nil {
-				log.Printf("Can't marshal node keys for the '%s': %s", prefix, err.Error())
-				break
-			}
 			nodePrefix := prefix + "."
-			o[nodePrefix] = OnlineConfItem{
-				Key:   nodePrefix,
-				Value: string(jsonBytes),
-				Type:  "application/x-yaml",
+			if len(childrenKeys) > 0 {
+				jsonBytes, err := json.Marshal(childrenKeys)
+				if err != nil {
+					log.Printf("Can't marshal node keys for the '%s': %s", prefix, err.Error())
+					break
+				}
+				o[nodePrefix] = OnlineConfItem{
+					Key:   nodePrefix,
+					Value: string(jsonBytes),
+					Type:  "application/x-yaml",
+				}
+			} else {
+				o[prefix] = OnlineConfItem{
+					Key:   prefix,
+					Value: "{}",
+					Type:  "application/x-yaml",
+				}
 			}
 		}
 		for _, key := range obj.MapKeys() {
