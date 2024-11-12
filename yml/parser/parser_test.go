@@ -37,6 +37,9 @@ fee:
           - fee: 2.15
             pmtype: FEEKEY2
             subject: "Simple fee"
+  parent_nested:
+    sub_parent01: {}
+    sub_parent02: {}
 `)
 
 	require.NoError(t, err)
@@ -47,7 +50,7 @@ fee:
 	expected := map[string]OnlineConfItem{
 		"fee.": {
 			Key:   "fee.",
-			Value: "[\"common\",\"volatile\"]",
+			Value: "[\"common\",\"parent_nested\",\"volatile\"]",
 			Type:  "application/x-yaml",
 		},
 		"fee/common.": {
@@ -68,6 +71,21 @@ fee:
 		"fee/common/R/1001-1001-1001/KEY1": {
 			Key:   "fee/common/R/1001-1001-1001/KEY1",
 			Value: "- fee: 4\n  pmtype: FEEKEY1\n  subject: Simple fee\n",
+			Type:  "application/x-yaml",
+		},
+		"fee/parent_nested.": {
+			Key:   "fee/parent_nested.",
+			Value: "[\"sub_parent01\",\"sub_parent02\"]",
+			Type:  "application/x-yaml",
+		},
+		"fee/parent_nested/sub_parent01": {
+			Key:   "fee/parent_nested/sub_parent01",
+			Value: "{}",
+			Type:  "application/x-yaml",
+		},
+		"fee/parent_nested/sub_parent02": {
+			Key:   "fee/parent_nested/sub_parent02",
+			Value: "{}",
 			Type:  "application/x-yaml",
 		},
 		"fee/volatile.": {
