@@ -39,7 +39,7 @@ fee:
             subject: "Simple fee"
   parent_nested:
     sub_parent01: {}
-    sub_parent02: {}
+    reg-exp-.*?@part01\.part02\.part03\.ru: {}
 `)
 
 	require.NoError(t, err)
@@ -75,7 +75,7 @@ fee:
 		},
 		"fee/parent_nested.": {
 			Key:   "fee/parent_nested.",
-			Value: "[\"sub_parent01\",\"sub_parent02\"]",
+			Value: "[\"reg-exp-.*?@part01\\\\.part02\\\\.part03\\\\.ru\",\"sub_parent01\"]",
 			Type:  "application/x-yaml",
 		},
 		"fee/parent_nested/sub_parent01": {
@@ -83,8 +83,8 @@ fee:
 			Value: "{}",
 			Type:  "application/x-yaml",
 		},
-		"fee/parent_nested/sub_parent02": {
-			Key:   "fee/parent_nested/sub_parent02",
+		"fee/parent_nested/reg-exp-.*?@part01\\.part02\\.part03\\.ru": {
+			Key:   "fee/parent_nested/reg-exp-.*?@part01\\.part02\\.part03\\.ru",
 			Value: "{}",
 			Type:  "application/x-yaml",
 		},

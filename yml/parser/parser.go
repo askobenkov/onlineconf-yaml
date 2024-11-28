@@ -92,14 +92,24 @@ func WalkByYML(obj reflect.Value, prefix string, storeNodes bool) map[string]Onl
 		res := WalkByYML(obj.Elem(), prefix, storeNodes)
 		o = mergeMaps(o, res)
 	case reflect.Map:
-		if storeNodes && prefix != "" {
+		if prefix != "" {
 			childrenKeys := []string{}
 			for _, key := range obj.MapKeys() {
 				p := key.Elem().String()
 				childrenKeys = append(childrenKeys, p)
 			}
 			nodePrefix := prefix + "."
-			if len(childrenKeys) > 0 {
+
+			if len(childrenKeys) == 0 {
+				o[prefix] = OnlineConfItem{
+					Key:   prefix,
+					Value: "{}",
+					Type:  "application/x-yaml",
+				}
+				break
+			}
+
+			if storeNodes {
 				sort.Strings(childrenKeys)
 				jsonBytes, err := json.Marshal(childrenKeys)
 				if err != nil {
@@ -109,12 +119,6 @@ func WalkByYML(obj reflect.Value, prefix string, storeNodes bool) map[string]Onl
 				o[nodePrefix] = OnlineConfItem{
 					Key:   nodePrefix,
 					Value: string(jsonBytes),
-					Type:  "application/x-yaml",
-				}
-			} else {
-				o[prefix] = OnlineConfItem{
-					Key:   prefix,
-					Value: "{}",
 					Type:  "application/x-yaml",
 				}
 			}
